@@ -1,19 +1,3 @@
-"""
-Copyright (C) 2017 Satish Kumar Kadarkarai Mani
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""
-
 import os
 import datetime
 import logging
@@ -165,10 +149,11 @@ class Report:
             return
 
         status = update_test_status(self.pass_step, self.fail_step, self.warn_step)
-
-        self.passed_tests += status[0]
-        self.failed_tests += status[1]
-        self.warning_tests += status[2]
+        
+        if status:
+            self.passed_tests += status[0]
+            self.failed_tests += status[1]
+            self.warning_tests += status[2]
         
         self.pass_step = 0
         self.fail_step = 0
