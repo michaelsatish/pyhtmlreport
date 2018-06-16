@@ -4,10 +4,9 @@ import logging
 import pkg_resources
 
 from PIL import ImageGrab
-
 from pyhtmlreport.utils import render_pie_chart, render_overall_status_table
 
-
+logger = logging.getLogger(__name__)
 MAX_SCREENSHOTS = 1000
 
 
@@ -17,10 +16,9 @@ class ReportError(Exception):
 
 def dispatch_screenshot_number():
     """
-    File name for screenshots:
-    generator to yield a number from 0 to arg: MAX_SCREENSHOTS
-    by default its 1000, if more than 1000 numbers are yielded contrasting to number of screenshots,
-    StopIteration exception will be thrown.
+    File name for screenshots
+    Generator to yield a number from 0 to arg: MAX_SCREENSHOTS
+    By default it is 1000 (MAX_SCREENSHOTS)
 
     :return: generator
     """
@@ -30,18 +28,20 @@ def dispatch_screenshot_number():
 
 def update_test_status(p, f, w):
     """
-    To update total passed, failed and warning tests
-    called before every test to update status of completed test, and called in function generate_report to update the
+    Update total passed, failed and warning tests
+    Called before every test to update status of completed test, and called in function generate_report to update the
     status of final test
 
-    if one or more fail steps, test is marked as failed
-    if one or more warn steps and no fail steps, test is maked as warning
-    if one or more pass steps and no fail or warn steps, test is marked as passed
+    If one or more fail steps, test is marked as failed
+    If one or more warn steps and no fail steps, test is maked as warning
+    If one or more pass steps and no fail or warn steps, test is marked as passed
 
     :param p: number of pass steps in a test
     :param f: number of fail steps in a test
     :param w: number of warn steps in a test
-    :return: list unpacked in function update_test_status to update total passed, failed and warning tests
+    :return: list 
+    
+    Unpacked in function update_test_status to update total passed, failed and warning tests
     """
     if f >= 1:
         return [0, 1, 0]
@@ -66,11 +66,11 @@ class Report:
 
     def __init__(self):
 
-        self.root_report_folder = None
-        self.module_folder = None
+        self.report_folder = None
+        self.application_folder = None
         self.capture_folder = None
 
-        self.module_name = None
+        self.application_name = None
         self.release_name = None
         self.selenium_driver = None
 
@@ -86,48 +86,60 @@ class Report:
         self.status = Status
         self.screenshot_num = dispatch_screenshot_number()
 
-    def setup(self, root_report_folder, module_name='default', release_name='default', selenium_driver=None):
+    def setup(self, report_folder, application_name='default', release_name='default', selenium_driver=None):
         """
         Setup followed by initialization of Report class to create report folders
-        :param root_report_folder:
-        :param module_name:
+        :param report_folder:
+        :param application_name:
         :param release_name:
         :param selenium_driver: pass the initialized webdriver to use the method save_screenshot for screenshots
         :return:
         """
-        if not root_report_folder:
+        if not report_folder:
             raise ReportError('Require Report Root Folder path')
 
-        if module_name == 'default':
+        if application_name == 'default':
             import warnings
-            warnings.warn('Module name set to default')
+            warnings.warn('Application name set to default')
 
-        self.root_report_folder = root_report_folder
-        self.module_name = module_name
+        self.report_folder = report_folder
+        self.application_name = application_name
         self.release_name = release_name
 
-        self.module_folder = os.path.join(self.root_report_folder,
-                                          '{name} {date}'.format(name=self.module_name,
-                                                                 date=datetime.datetime.now().strftime('%m_%d_%Y '
-                                                                                                       '%H_%M_%S')))
-        self.capture_folder = os.path.join(self.module_folder, 'Capture')
+        self.application_folder = os.path.join(
+            self.report_folder,
+            '{name} {date}'.format(
+                name=self.application_name,
+                date=datetime.datetime.now().strftime('%m_%d_%Y %H_%M_%S')
+                )
+            )
+
+        self.capture_folder = os.path.join(self.application_folder, 'Capture')
         self.selenium_driver = selenium_driver
 
-        if not os.path.exists(self.root_report_folder):
-            os.mkdir(self.root_report_folder)
+        if not os.path.exists(self.report_folder):
+            os.mkdir(self.report_folder)
 
-        if not os.path.exists(self.module_folder):
-            os.mkdir(self.module_folder)
+        if not os.path.exists(self.application_folder):
+            os.mkdir(self.application_folder)
 
         if not os.path.exists(self.capture_folder):
             os.mkdir(self.capture_folder)
 
+    @property
+    def use_selenium_driver(self):
+        return self.selenium_driver
+
+    @use_selenium_driver.setter
+    def use_selenium_driver(self, driver):
+        self.selenium_driver = driver
+
     def __repr__(self):
-        return 'Report(module_name=%s, release_name=%s)' % (self.module_name, self.release_name)
+        return 'Report(application_name=%s, release_name=%s)' % (self.application_name, self.release_name)
 
     def capture_screenshot(self):
         """
-        Capture screenshot of default monitor view
+        Capture screenshot
         If selenium_driver is set, screenshot of the browser view port is captured
         """
         current_screenshot = os.path.join(self.capture_folder, str(next(self.screenshot_num)) + '.png')
@@ -139,7 +151,7 @@ class Report:
 
             return current_screenshot
         except Exception as e:
-            logging.log(40, str(e))
+            logging.error(msg=f'Unable to capture screenshot {e}')
 
     def update_test_status(self):
         if all(not x for x in [self.total_tests, self.pass_step, self.fail_step, self.warn_step]):
@@ -229,9 +241,9 @@ class Report:
         self.update_test_status()
 
         try:
-            with open(os.path.join(self.module_folder, 'Report.html'), 'w') as f:
+            with open(os.path.join(self.application_folder, 'Report.html'), 'w') as f:
                 d = {
-                    'module_name': self.module_name,
+                    'module_name': self.application_name,
                     'release_name': self.release_name,
                     'date': datetime.datetime.now().strftime('%m_%d_%Y'),
                     'result': self.step,
@@ -241,7 +253,7 @@ class Report:
                 }
                 f.write(self.html.format(**d))
         except Exception as e:
-            logging.log(40, str(e))
+            logging.error(msg=f'Unable to generate Test Result file {e}')
             raise ReportError('Unable to generate Test Result file')
 
-        return self.module_folder
+        return self.application_folder

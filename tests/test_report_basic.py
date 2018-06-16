@@ -48,7 +48,7 @@ def test_html():
 
 def test_selenium_webdriver_plug():
     r = Report()
-    assert not r.selenium_webdriver
+    assert not r.selenium_driver
 
 
 if __name__ == '__main__':
