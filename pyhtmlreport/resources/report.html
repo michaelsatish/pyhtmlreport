@@ -1,77 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <!-- meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Automation Report</title>
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-    <title>Automation | Test Report</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+    <!--CSS-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    <style>
+        body {
+            background-color: #F2F2F2;
+        }
+        #tests td:hover {
+            cursor: pointer;
+        }
+    </style>
+</head>
 
-  </head>
-  
-  <header>
-	<!-- Navigation Bar -->
-	<nav class="navbar navbar-light bg-info text-white">
-      <div class="container">
-        <h1 class="display-5">Automation Test Report</h1>
-        <p class="h6">Module: {module_name}<br>Release: {release_name}<br>Date: {date}</p>
-      </div>
-    </nav>
-  </header>
-  
-  <body>
-    <!-- Test Results -->
-    <div class="container">
-
-      <div class="row">
-        <div class="col-md-7">
-          <p class="lead">Test Run</p>
-          <table class="table table-bordered">
-            <thead class="thead-default">
-              <tr>
-                <th>Step</th>
-                <th>Status</th>
-                <th>Screenshot</th>
-              </tr>
-            </thead>
-           <tbody>
-              {result}
-            </tbody>
-          </table>
+<body>
+    <header>
+        <!--Nav Bar-->
+        <div class="navbar-fixed">
+            <nav class="white">
+                <div class="nav-wrapper">
+                    <div class="container">
+                        <h6 class="brand-logo green-text"><b>Automation Report</b></h6>
+                        <ul class="right">
+                            <li><a href="#" class="green-text">Env: <b>{env}</b></a></li>
+                            <li><a href="#" class="green-text">Release: <b>{module_name}</b></a></li>
+                            <li><a href="#" class="green-text">Module: <b>{release_name}</b></a></li>
+                            <li><a href="#" class="green-text">Run Date: <b>{run_date}</b></a></li>
+                            <li><a href="#" class="green-text">Run Time: <b>{run_time}</b></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
         </div>
+    </header>
 
-        <div class="col-md-4">
-          <!-- Overall Status -->
-          <p class="lead">Overall Status</p>
-          <table class="table table-bordered">
-            <thead class="thead-default">
-              <tr>
-                <th>Total</th>
-                <th>Passed</th>
-                <th>Failed</th>
-                <th>Warning</th>
-              </tr>
-            </thead>
-              {overall_status}
-            <tbody>
-            </tbody>
-          </table>
+    <main>
+        <div class="container section">
+            <!--Status Cards-->
+            <div class="row">
+                <div class="col l3 m6 s12">
+                    <div class="card grey lighten-2 z-depth-2">
+                        <div class="card-content">
+                            <span class="card-title">Total</span>
+                            <p>{total_tests}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col l3 m6 s12">
+                    <div class="card green lighten-2 z-depth-2">
+                        <div class="card-content">
+                            <span class="card-title">Passed</span>
+                            <p>{passed_tests}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col l3 m6 s12">
+                    <div class="card red lighten-2 z-depth-2">
+                        <div class="card-content">
+                            <span class="card-title">Failed</span>
+                            <p>{failed_tests}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col l3 m6 s12">
+                    <div class="card orange lighten-2 z-depth-2">
+                        <div class="card-content">
+                            <span class="card-title">Warning</span>
+                            <p>{warning_tests}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!--Search Tests-->
+            <div class="row">
+                <div class="input-field s12 hide-on-med-and-down">
+                    <i class="material-icons prefix">search</i>
+                    <input type="text" id="search">
+                    <label for="search">Search Tests</label>
+                </div>
+            </div>
+            
+            <!--Tests-->
+            <div class="row">
+                <table class="centered">
+                    <thead>
+                        <tr>
+                            <th>ALM #</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tests">
+                        <tr class="show-modal">
+                            <td class="id">129366</td>
+                            <td>NYHBE Contact Select Message</td>
+                            <td>Pass</td>
+                        </tr>
+                        <tr class="show-modal red lighten-2">
+                            <td class="id">129367</td>
+                            <td>SWCC Contact Select Message</td>
+                            <td>Fail</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-          <!-- Pie Chart -->
-          <canvas id="myPieChart"></canvas>
-          <script>
-            {pie_chart}
-          </script>
+            <div id="modal1" class="modal modal-fixed-footer">
+                <div class="modal-content">
+                </div>
+                <div class="modal-footer">
+                    <a href="#!" class="btn modal-close waves-effect waves-green btn-flat">Close</a>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-	
-    <!-- JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-  </body>
+    </main>
+    <!--JS & JQuery-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $(".modal").modal();
+
+            // Filter the Tests Table
+            $("#search").keyup(function() {
+                const data = this.value;
+                const testsRun = $("#tests").find("tr");
+                
+                if(data == "") {
+                    testsRun.show();
+                    return;
+                }
+    
+                testsRun.filter(function() {
+                    $(this).toggle($(this).text().indexOf(data) > -1);
+                });
+            });
+
+            $(".show-modal").click(function() {
+                $(".modal-content").load("/tests/" + $(this).find(".id").html() + ".html", function(){
+                    $(".modal").modal('open');
+                    $('.materialboxed').materialbox();
+                });
+                
+            });
+        });
+    </script>
+</body>
 </html>
