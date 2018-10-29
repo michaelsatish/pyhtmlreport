@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Automation Report</title>
+
+    <!--CSS-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    <style>
+        body {
+            background-color: #F2F2F2;
+        }
+        #tests td:hover {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <!--Nav Bar-->
+        <div class="navbar-fixed">
+            <nav class="white">
+                <div class="nav-wrapper">
+                    <div class="container">
+                        <h6 class="brand-logo green-text"><b>Automation Report</b></h6>
+                        <ul class="right">
+                            <li><a href="#" class="green-text">Env: <b>{env}</b></a></li>
+                            <li><a href="#" class="green-text">Release: <b>{module_name}</b></a></li>
+                            <li><a href="#" class="green-text">Module: <b>{release_name}</b></a></li>
+                            <li><a href="#" class="green-text">Run Date: <b>{run_date}</b></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container section">
+            <!--Status Cards-->
+            <div class="row">
+                <div class="col l3 m6 s12">
+                    <div class="card grey lighten-2 z-depth-2">
+                        <div class="card-content">
+                            <span class="card-title">Total</span>
+                            <p>{total_tests}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col l3 m6 s12">
+                    <div class="card green lighten-2 z-depth-2">
+                        <div class="card-content">
+                            <span class="card-title">Passed</span>
+                            <p>{passed_tests}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col l3 m6 s12">
+                    <div class="card red lighten-2 z-depth-2">
+                        <div class="card-content">
+                            <span class="card-title">Failed</span>
+                            <p>{failed_tests}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col l3 m6 s12">
+                    <div class="card orange lighten-2 z-depth-2">
+                        <div class="card-content">
+                            <span class="card-title">Warning</span>
+                            <p>{warning_tests}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!--Search Tests-->
+            <div class="row">
+                <div class="input-field s12 hide-on-med-and-down">
+                    <i class="material-icons prefix">search</i>
+                    <input type="text" id="search">
+                    <label for="search">Search Tests</label>
+                </div>
+            </div>
+            
+            <!--Tests-->
+            <div class="row">
+                <table class="centered">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tests">
+                        {% for test in tests %}
+                            {% if test.status == "Fail" %}
+                                {% set row_class = "show-modal red lighten-2" %}
+                            {% elif test.status == "Warn" %}
+                                {% set row_class = "show-modal orange lighten-2" %}
+                            {% else %}
+                                {% set row_class = "show-modal" %}
+                            {% endif %}
+                            <tr class="{{ row_class }}">
+                                <td class="id">{{ test.number }}</td>
+                                <td class="id">{{ test.description }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="modal1" class="modal modal-fixed-footer">
+                <div class="modal-content">
+                </div>
+                <div class="modal-footer">
+                    <a href="#!" class="btn modal-close waves-effect waves-green btn-flat">Close</a>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!--JS & JQuery-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $(".modal").modal();
+
+            // Filter the Tests Table
+            $("#search").keyup(function() {
+                const data = this.value;
+                const testsRun = $("#tests").find("tr");
+                
+                if(data == "") {
+                    testsRun.show();
+                    return;
+                }
+    
+                testsRun.filter(function() {
+                    $(this).toggle($(this).text().indexOf(data) > -1);
+                });
+            });
+
+            $(".show-modal").click(function() {
+                $(".modal-content").load("/tests/" + $(this).find(".id").html() + ".html", function(){
+                    $(".modal").modal('open');
+                    $('.materialboxed').materialbox();
+                });
+                
+            });
+        });
+    </script>
+</body>
+</html>
