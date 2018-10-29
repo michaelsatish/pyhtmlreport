@@ -1,1 +1,1 @@
-from pyhtmlreport.client import Report
+from pyhtmlreport.report import Report
