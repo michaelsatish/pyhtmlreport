@@ -107,7 +107,8 @@
                             {% endif %}
                             <tr class="{{ row_class }}">
                                 <td class="id">{{ test.number }}</td>
-                                <td class="id">{{ test.description }}</td>
+                                <td>{{ test.description }}</td>
+                                <td>{{ test.status }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
