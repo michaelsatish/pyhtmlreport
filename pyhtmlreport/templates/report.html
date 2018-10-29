@@ -29,10 +29,9 @@
                     <div class="container">
                         <h6 class="brand-logo green-text"><b>Automation Report</b></h6>
                         <ul class="right">
-                            <li><a href="#" class="green-text">Env: <b>{env}</b></a></li>
-                            <li><a href="#" class="green-text">Release: <b>{module_name}</b></a></li>
-                            <li><a href="#" class="green-text">Module: <b>{release_name}</b></a></li>
-                            <li><a href="#" class="green-text">Run Date: <b>{run_date}</b></a></li>
+                            <li><a href="#" class="green-text">Module: <b>{{ module_name }}</b></a></li>
+                            <li><a href="#" class="green-text">Release: <b>{{ release_name }}</b></a></li>
+                            <li><a href="#" class="green-text">Run Date: <b>{{ run_date }}</b></a></li>
                         </ul>
                     </div>
                 </div>
@@ -48,7 +47,7 @@
                     <div class="card grey lighten-2 z-depth-2">
                         <div class="card-content">
                             <span class="card-title">Total</span>
-                            <p>{total_tests}</p>
+                            <p>{{ total_tests }}</p>
                         </div>
                     </div>
                 </div>
@@ -56,7 +55,7 @@
                     <div class="card green lighten-2 z-depth-2">
                         <div class="card-content">
                             <span class="card-title">Passed</span>
-                            <p>{passed_tests}</p>
+                            <p>{{ passed_tests }}</p>
                         </div>
                     </div>
                 </div>
@@ -64,7 +63,7 @@
                     <div class="card red lighten-2 z-depth-2">
                         <div class="card-content">
                             <span class="card-title">Failed</span>
-                            <p>{failed_tests}</p>
+                            <p>{{ failed_tests }}</p>
                         </div>
                     </div>
                 </div>
@@ -72,7 +71,7 @@
                     <div class="card orange lighten-2 z-depth-2">
                         <div class="card-content">
                             <span class="card-title">Warning</span>
-                            <p>{warning_tests}</p>
+                            <p>{{ warning_tests} </p>
                         </div>
                     </div>
                 </div>
