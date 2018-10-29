@@ -29,7 +29,6 @@ def dispatch_screenshot_number(max_screenshots: int) -> Generator[int, None, Non
 
 
 class Status:
-
     Start: str = 'Start'
     Pass: str = 'Pass'
     Fail: str = 'Fail'
@@ -38,12 +37,10 @@ class Status:
 
 
 @dataclass
-class TestStep:
-    step: str
+class Step:
+    description: str
     status: str
     screenshot: Optional[str]
-    html: str = field(default=None)
-    color_class: str = field(default='')
 
 
 @dataclass
@@ -51,7 +48,7 @@ class Test:
     number: int
     description: str
     status: str = field(default=None)
-    steps: List[TestStep] = field(default_factory=list)
+    steps: List[Step] = field(default_factory=list)
 
 
 class Tests(list):
@@ -97,8 +94,8 @@ class Report:
         self.selenium_driver = None
 
         self.env = Environment(loader=FileSystemLoader('templates'))
-        self.report_template = env.get_template('report.html')
-        self.test_template = env.get_template('test.html')
+        self.report_template = self.env.get_template('report.html')
+        self.test_template = self.env.get_template('test.html')
 
         self.tests = Tests()
         self.test = None
@@ -208,15 +205,12 @@ class Report:
                 self.tests.append(self.test_run)
                 self.test = Test(test_number, step)
 
-            self.total_tests += 1
-            return self.test
-
         elif status in ['Pass', 'Fail', 'Warn', 'Highlight']:
             if not self.test:
                 raise ReportError(
                     'Start step missing, please have a Start step before calling other statues'
                 )
-            self.test.steps.append(TestStep(step, status, self.screenshot))
+            self.test.steps.append(Step(step, status, self.screenshot))
 
         else:
             raise ReportError('Invalid Status')
