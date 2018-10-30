@@ -4,7 +4,7 @@ setup(
 	name='pyhtmlreport',
 	version='1.0',
 	packages=['pyhtmlreport'],
-	package_data = {'pyhtmlreport': ['data/*']},
+	package_data = {'pyhtmlreport': ['templates/*']},
 	description='python library to implement html reporting',
 	author='Satish Kumar Kadarkarai Mani',
 	author_email='michael.satish@gmail.com',
