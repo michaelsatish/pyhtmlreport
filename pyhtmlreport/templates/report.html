@@ -124,32 +124,36 @@
             </div>
 
             <!-- Steps -->
-            <div style="display: none">
+            <div style="display: none;">
                 {% for test in tests %}
-                    <table id="{{ test.number }}">
-                        <thead>
-                            <tr>
-                                <th>Steps</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for step in test.steps %}
-                                {% if step.status == "Fail" %}
-                                    {% set row_class = "red lighten-2" %}
-                                {% elif step.status == "Warn" %}
-                                    {% set row_class = "orange lighten-2" %}
-                                {% else %}
-                                    {% set row_class = "" %}
-                                {% endif %}
-                                <tr class="{{ row_class }}">
-                                    <td>{{ step.description }}</td>
-                                    {% if step.screenshot %}
-                                        <img class="materialboxed" width="25" src="Screenshots\{{ step.screenshot }}.png">
-                                    {% endif %}
+                    <div id="{{ test.number }}">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Steps</th>
+                                    <th>Screenshot</th>
                                 </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {% for step in test.steps %}
+                                    {% if step.status == "Fail" %}
+                                        <tr class="red lighten-2">
+                                    {% elif step.status == "Warn" %}
+                                        <tr class="orange lighten-2">
+                                    {% else %}
+                                        <tr>
+                                    {% endif %}
+                                    <td>{{ step.description }}</td>
+                                    <td>
+                                        {% if step.screenshot %}
+                                            <img class="materialboxed" width="25" src="Screenshots\{{ step.screenshot }}.png">
+                                        {% endif %}
+                                    </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 {% endfor %}
             </div>
         </div>
@@ -160,7 +164,6 @@
     <script>
         $(document).ready(function(){
             $(".modal").modal();
-            $('.materialboxed').materialbox();
 
             // Filter the Tests Table
             $("#search").keyup(function() {
@@ -185,8 +188,8 @@
                     $("#" + testNumber).html()
                 );
                 $(".modal").modal('open');
+                $('.materialboxed').materialbox();
             });
-
         });
     </script>
 </body>
