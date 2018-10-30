@@ -2,6 +2,7 @@ import logging
 import os
 from dataclasses import dataclass, field
 from datetime import datetime
+from shutil import copy2
 from typing import Generator, List, Optional
 
 from jinja2 import Environment, FileSystemLoader
@@ -206,7 +207,7 @@ class Report:
         else:
             raise ReportError('Invalid Status')
 
-    def add_attachment(attachment):
+    def add_attachment(self, attachment):
         self.attachments.append(attachment)
 
     def generate_report(self):
@@ -214,6 +215,14 @@ class Report:
         Generate the Automation Report
         """
         self.tests.append(self.test)
+
+        if self.attachments:
+            attachments_folder = os.path.join(self.module_folder, 'Attachments')
+            if not os.path.exists(attachments_folder):
+                os.mkdir(attachments_folder)
+
+            for attachment in self.attachments:
+                copy2(attachment, attachments_folder)
 
         total_tests = len(self.tests)
         passed_tests = len([test for test in self.tests if test.status == 'Pass'])
