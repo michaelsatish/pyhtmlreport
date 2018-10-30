@@ -71,7 +71,7 @@
                     <div class="card orange lighten-2 z-depth-2">
                         <div class="card-content">
                             <span class="card-title">Warning</span>
-                            <p>{{ warning_tests} </p>
+                            <p>{{ warning_tests}}</p>
                         </div>
                     </div>
                 </div>
@@ -122,6 +122,36 @@
                     <a href="#!" class="btn modal-close waves-effect waves-green btn-flat">Close</a>
                 </div>
             </div>
+
+            <!-- Steps -->
+            <div style="display: none">
+                {% for test in tests %}
+                    <table id="{{ test.number }}">
+                        <thead>
+                            <tr>
+                                <th>Steps</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for step in test.steps %}
+                                {% if step.status == "Fail" %}
+                                    {% set row_class = "red lighten-2" %}
+                                {% elif step.status == "Warn" %}
+                                    {% set row_class = "orange lighten-2" %}
+                                {% else %}
+                                    {% set row_class = "" %}
+                                {% endif %}
+                                <tr class="{{ row_class }}">
+                                    <td>{{ step.description }}</td>
+                                    {% if step.screenshot %}
+                                        <img class="materialboxed" width="25" src="Screenshots\{{ step.screenshot }}.png">
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endfor %}
+            </div>
         </div>
     </main>
     <!--JS & JQuery-->
@@ -130,6 +160,7 @@
     <script>
         $(document).ready(function(){
             $(".modal").modal();
+            $('.materialboxed').materialbox();
 
             // Filter the Tests Table
             $("#search").keyup(function() {
@@ -140,18 +171,22 @@
                     testsRun.show();
                     return;
                 }
-    
+
                 testsRun.filter(function() {
                     $(this).toggle($(this).text().indexOf(data) > -1);
                 });
             });
 
+            // Render the Test
             $(".show-modal").click(function() {
-                $(".modal-content").load("/tests/" + $(this).find(".id").html() + ".html", function(){
-                    $(".modal").modal('open');
-                    $('.materialboxed').materialbox();
-                });
+                const testNumber = $(this).find(".id").html();
+
+                $(".modal-content").html(
+                    $("#" + testNumber).html()
+                );
+                $(".modal").modal('open');
             });
+
         });
     </script>
 </body>
