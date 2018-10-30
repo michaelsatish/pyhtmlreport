@@ -1,10 +1,8 @@
-import datetime
 import logging
 import os
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Generator, List, Optional
-
-import pkg_resources
 
 from jinja2 import Environment, FileSystemLoader
 from PIL import ImageGrab
@@ -85,7 +83,6 @@ class Report:
         self.report_folder = None
         self.module_folder = None
         self.screenshots_folder = None
-        self.tests_folder = None
 
         self.module_name = None
         self.release_name = None
@@ -93,18 +90,15 @@ class Report:
         self.max_screenshots = 1000
         self.selenium_driver = None
 
-        self.env = Environment(loader=FileSystemLoader('templates'))
+        self.env = Environment(
+            loader=FileSystemLoader(searchpath=os.path.join(__file__, '../templates'))
+        )
         self.report_template = self.env.get_template('report.html')
-        self.test_template = self.env.get_template('test.html')
 
         self.tests = Tests()
         self.test = None
-
-        self.step = ''
+        self.attachments = []
         self.screenshot = None
-
-        self.total_tests, self.passed_tests = 0, 0
-        self.failed_tests, self.warning_tests = 0, 0
 
         self.status = Status
         self.screenshot_num = dispatch_screenshot_number(self.max_screenshots)
@@ -148,14 +142,13 @@ class Report:
             self.report_folder,
             '{name} {date}'.format(
                 name=self.module_name,
-                date=datetime.datetime.now().strftime('%m_%d_%Y %H_%M_%S')
+                date=datetime.now().strftime('%m_%d_%Y %H_%M_%S')
                 )
             )
 
         self.screenshots_folder = os.path.join(
             self.module_folder, 'Screenshots'
         )
-        self.tests_folder = os.path.join(self.module_folder, 'Tests')
 
         if not os.path.exists(self.report_folder):
             os.mkdir(self.report_folder)
@@ -166,9 +159,6 @@ class Report:
         if not os.path.exists(self.screenshots_folder):
             os.mkdir(self.screenshots_folder)
 
-        if not os.path.exists(self.tests_folder):
-            os.mkdir(self.tests_folder)
-
     def __repr__(self):
         return 'Report(Module=%s, Release=%s)' % (self.module_name, self.release_name)
 
@@ -177,9 +167,10 @@ class Report:
         Capture screenshot
         If selenium_driver, screenshot of the browser view port is captured
         """
+        current_screenshot_num = str(next(self.screenshot_num))
         current_screenshot = os.path.join(
             self.screenshots_folder,
-            str(next(self.screenshot_num)) + '.png'
+            current_screenshot_num + '.png'
         )
 
         if self.selenium_driver:
@@ -187,7 +178,7 @@ class Report:
         else:
             ImageGrab.grab().save(current_screenshot)
 
-        return current_screenshot
+        return current_screenshot_num
 
     def write_step(self, step, status, test_number=None, *, screenshot=False):
         if screenshot:
@@ -202,7 +193,7 @@ class Report:
             if not self.test:
                 self.test = Test(test_number, step)
             else:
-                self.tests.append(self.test_run)
+                self.tests.append(self.test)
                 self.test = Test(test_number, step)
 
         elif status in ['Pass', 'Fail', 'Warn', 'Highlight']:
@@ -215,9 +206,29 @@ class Report:
         else:
             raise ReportError('Invalid Status')
 
+    def add_attachment(attachment):
+        self.attachments.append(attachment)
+
     def generate_report(self):
         """
         Generate the Automation Report
-        :return: report folder
         """
         self.tests.append(self.test)
+
+        total_tests = len(self.tests)
+        passed_tests = len([test for test in self.tests if test.status == 'Pass'])
+        failed_tests = len([test for test in self.tests if test.status == 'Fail'])
+        warning_tests = len([test for test in self.tests if test.status == 'Warn'])
+
+        report_output = self.report_template.render(
+            module_name=self.module_name,
+            release_name=self.release_name,
+            run_date=datetime.now().strftime('%m:%d:%Y'),
+            total_tests=total_tests,
+            passed_tests=passed_tests,
+            failed_tests=failed_tests,
+            warning_tests=warning_tests,
+            tests=self.tests
+        )
+        with open(os.path.join(self.module_folder, 'Report.html'), 'w') as f:
+            f.write(report_output)
