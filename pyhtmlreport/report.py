@@ -222,6 +222,8 @@ class Report:
                 os.mkdir(attachments_folder)
 
             for attachment in self.attachments:
+                if not os.path.isfile(attachment):
+                    raise ReportError(f'{attachment} is not of type file')
                 copy2(attachment, attachments_folder)
 
         total_tests = len(self.tests)
