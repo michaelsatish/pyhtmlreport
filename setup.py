@@ -5,11 +5,24 @@ setup(
 	version='1.0',
 	packages=['pyhtmlreport'],
 	package_data = {'pyhtmlreport': ['templates/*']},
-	description='python library to implement html reporting',
+	description='Implement html reporting in Test Automation',
 	author='Satish Kumar Kadarkarai Mani',
 	author_email='michael.satish@gmail.com',
+	url='https://github.com/michaelsatish/pyhtmlreport',
 	install_requires=[
 		'Pillow>=5.3.0',
 		'jinja2>=2.10'
-		]
-	)
+	],
+	keywords='html report',
+	classifiers=[
+		'Development Status :: 5 - Production/Stable',
+		'Intended Audience :: Developers',
+		'Operating System :: POSIX',
+		'Operating System :: Microsoft :: Windows',
+		'Operating System :: MacOS :: MacOS X',
+		'Topic :: Software Development :: Quality Assurance',
+		'Topic :: Software Development :: Testing',
+		'Topic :: Utilities',
+		'Programming Language :: Python :: 3.7'
+	]
+)
