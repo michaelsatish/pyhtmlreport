@@ -27,7 +27,7 @@ report.setup(
 driver.get('https://www.google.com/')
 
 try:
-	# Start of Test
+    # Start of Test
     report.write_step(
         'Testing Search functionality',
         status=report.status.Start,
@@ -39,7 +39,6 @@ try:
 
     # Test Steps
     results = driver.find_elements_by_css_selector('div[id="search"] div[class="g"]')
-    print(len(results))
     assert len(results) > 1
     report.write_step(
         'Google Search returned more than 1 results',
