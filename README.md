@@ -3,38 +3,61 @@
 Implement Html Reports in Test Automation. 
 
 
-# Requirements
+### Requirements ###
 
-Requires Python 3.7 or higher
-Access to Internet, materlizecss is used to style the html report and accessed via cdn
-https://materializecss.com/
+* Requires Python 3.7 or higher
+* Access to Internet, materlizecss (https://materializecss.com/) is used to style the html report and accessed via cdn
 
-## How to use:
+## How to use ###
 
-```
-from selenium.webdriver import Chrome
+```python
 from pyhtmlreport import Report
-
-driver = Chrome('path to chromedriver')
-driver.get('https://www.google.com/')
+from selenium.webdriver import Chrome
+from selenium.webdriver.common.keys import Keys
 
 report = Report()
-report.setup('C:\Automation\Reports', application_name='Google Search', release_name='Test Release')
+driver = Chrome()
 
-# Mandatory, report.status.Start signals the start of the Test Run
-report.write_step('Testing Search functionality', status=report.status.Start)
-driver.find_element_by_id('lst-ib').send_keys('Python is Awesome')
-driver.find_element_by_css_selector('input[value="Google Search"]').click()
+report.setup(
+	report_folder=r'D:\Automation\Reports',
+	module_name='Google',
+	release_name='Release 1',
+	selenium_driver=driver
+)
+driver.get('https://www.google.com/')
 
 try:
-    results = driver.find_elements_by_tag_name('a')
+	# Start of Test
+    report.write_step(
+        'Testing Search functionality',
+        status=report.status.Start,
+        test_number=1
+    )
+    search_box = driver.find_element_by_css_selector('input[aria-label="Search"]')
+    search_box.send_keys('pyhtmlreport is Awesome')
+    search_box.send_keys(Keys.ENTER)
+
+    # Test Steps
+    results = driver.find_elements_by_css_selector('div[id="search"] div[class="g"]')
+    print(len(results))
     assert len(results) > 1
-    report.write_step('More than 1 result as expected', status=report.status.Pass, screenshot=True)
+    report.write_step(
+        'Google Search returned more than 1 results',
+        status=report.status.Pass,
+        screenshot=True
+    )
 except AssertionError:
-    report.write_step('No results', status=report.status.Fail, screenshot=True)
+	report.write_step(
+        'Google Search did not return any result',
+        status=report.status.Fail,
+        screenshot=True
+    )
 except Exception as e:
-    print(e)
-    report.write_step('Something went wrong during execution!', status=report.status.Warn, screenshot=True)
+	report.write_step(
+        f'Something went wrong during execution!</br>{e}',
+        status=report.status.Warn,
+        screenshot=True
+    )
 finally:
     report.generate_report()
     driver.quit()
