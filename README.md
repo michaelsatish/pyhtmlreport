@@ -1,10 +1,13 @@
 # pyhtmlreport
-A python library to implement HTML Reports. 
 
-Automation testing projects using selenium webdriver rely on third party API's to generate reports. 
-This API tries to solve the need for automation test report with detailed  
+Implement Html Reports in Test Automation. 
 
-Requires Python 3.6.5 or higher
+
+# Requirements
+
+Requires Python 3.7 or higher
+Access to Internet, materlizecss is used to style the html report and accessed via cdn
+https://materializecss.com/
 
 ## How to use:
 
