@@ -1,11 +1,15 @@
 from setuptools import setup
 
+with open('README.md', 'r') as fh:
+    long_description = fh.read()
+
 setup(
 	name='pyhtmlreport',
 	version='1.0',
 	packages=['pyhtmlreport'],
 	package_data = {'pyhtmlreport': ['templates/*']},
 	description='Implement html reporting in Test Automation',
+	long_description=long_description,
 	author='Satish Kumar Kadarkarai Mani',
 	author_email='michael.satish@gmail.com',
 	url='https://github.com/michaelsatish/pyhtmlreport',
