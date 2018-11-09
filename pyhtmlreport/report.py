@@ -15,15 +15,15 @@ class ReportError(Exception):
     pass
 
 
-def dispatch_screenshot_number(max_screenshots: int) -> Generator[int, None, None]:
+def dispatch_screenshot_number(max_ss: int) -> Generator[int, None, None]:
     """
     File name for screenshots
-    Generator to yield a number from 0 to arg: max_screenshots
+    Generator to yield a number from 0 to arg: max_ss
 
     To govern the no of screenshots for a run
     :return: generator
     """
-    for x in list(range(max_screenshots)):
+    for x in list(range(max_ss)):
         yield x
 
 
@@ -51,14 +51,15 @@ class Test:
 
 
 class Tests(list):
+    """
+    If one or more fail steps, test is marked as failed
+    If one or more warn steps and no fail steps,test is maked as warning
+    If one or more pass steps and no fail/warn steps, test is marked as passed
+    """
 
     def append(self, test):
         if not isinstance(test, Test):
             raise TypeError(f'{test} is not of type Test')
-
-        # If one or more fail steps, test is marked as failed
-        # If one or more warn steps and no fail steps, test is maked as warning
-        # If one or more pass steps and no fail/warn steps, test is marked as passed
 
         statues = [step.status for step in test.steps]
         pass_ = statues.count('Pass')
@@ -92,7 +93,9 @@ class Report:
         self.selenium_driver = None
 
         self.env = Environment(
-            loader=FileSystemLoader(searchpath=os.path.join(__file__, '../templates'))
+            loader=FileSystemLoader(
+                searchpath=os.path.join(__file__, '../templates')
+            )
         )
         self.report_template = self.env.get_template('report.html')
 
@@ -161,7 +164,10 @@ class Report:
             os.mkdir(self.screenshots_folder)
 
     def __repr__(self):
-        return 'Report(Module=%s, Release=%s)' % (self.module_name, self.release_name)
+        return 'Report(Module=%s, Release=%s)' % (
+            self.module_name,
+            self.release_name
+        )
 
     def capture_screenshot(self):
         """
@@ -200,7 +206,7 @@ class Report:
         elif status in ['Pass', 'Fail', 'Warn', 'Highlight']:
             if not self.test:
                 raise ReportError(
-                    'Start step missing, please have a Start step before calling other statues'
+                    'Start step missing, please call Start status first'
                 )
             self.test.steps.append(Step(step, status, self.screenshot))
 
@@ -208,28 +214,35 @@ class Report:
             raise ReportError('Invalid Status')
 
     def add_attachment(self, attachment):
+        if not os.path.isfile(attachment):
+            raise ReportError(f'{attachment} is not of type file')
         self.attachments.append(attachment)
 
     def generate_report(self):
-        """
-        Generate the Automation Report
-        """
+        # Generate the Automation Report
         self.tests.append(self.test)
 
         if self.attachments:
-            attachments_folder = os.path.join(self.module_folder, 'Attachments')
+            attachments_folder = os.path.join(
+                self.module_folder,
+                'Attachments'
+            )
             if not os.path.exists(attachments_folder):
                 os.mkdir(attachments_folder)
 
             for attachment in self.attachments:
-                if not os.path.isfile(attachment):
-                    raise ReportError(f'{attachment} is not of type file')
                 copy2(attachment, attachments_folder)
 
         total_tests = len(self.tests)
-        passed_tests = len([test for test in self.tests if test.status == 'Pass'])
-        failed_tests = len([test for test in self.tests if test.status == 'Fail'])
-        warning_tests = len([test for test in self.tests if test.status == 'Warn'])
+        passed_tests = len([
+            test for test in self.tests if test.status == 'Pass']
+        )
+        failed_tests = len(
+            [test for test in self.tests if test.status == 'Fail']
+        )
+        warning_tests = len(
+            [test for test in self.tests if test.status == 'Warn']
+        )
 
         report_output = self.report_template.render(
             module_name=self.module_name,
