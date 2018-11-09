@@ -46,17 +46,17 @@ try:
     	screenshot=True
     )
 except AssertionError:
-	report.write_step(
-	    'Google Search did not return any result',
-	    status=report.status.Fail,
-	    screenshot=True
-	)
+    report.write_step(
+        'Google Search did not return any result',
+	 status=report.status.Fail,
+	 screenshot=True
+    )
 except Exception as e:
-	report.write_step(
-	    f'Something went wrong during execution!</br>{e}',
-	    status=report.status.Warn,
-	    screenshot=True
-	)
+    report.write_step(
+        f'Something went wrong during execution!</br>{e}',
+        status=report.status.Warn,
+	screenshot=True
+    )
 finally:
     report.generate_report()
     driver.quit()
