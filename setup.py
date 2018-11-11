@@ -6,18 +6,20 @@ with open('README.md', 'r') as fh:
 setup(
 	name='pyhtmlreport',
 	version='1.0',
-	packages=['pyhtmlreport'],
-	package_data = {'pyhtmlreport': ['templates/*']},
 	description='Implement html reporting in Test Automation',
-	long_description=long_description,
 	author='Satish Kumar Kadarkarai Mani',
 	author_email='michael.satish@gmail.com',
 	url='https://github.com/michaelsatish/pyhtmlreport',
+	long_description=long_description,
+	long_description_content_type='text/markdown',
+	license='Apache License 2.0',
+	keywords='html report',
+	packages=['pyhtmlreport'],
+	package_data = {'pyhtmlreport': ['templates/*']},
 	install_requires=[
 		'Pillow>=5.3.0',
 		'jinja2>=2.10'
 	],
-	keywords='html report',
 	classifiers=[
 		'Development Status :: 5 - Production/Stable',
 		'Intended Audience :: Developers',
