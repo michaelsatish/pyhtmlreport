@@ -1,14 +1,35 @@
 # pyhtmlreport
 
-Implement Html Reports in Test Automation. 
-
+Often open source Test Automation projects lack a good reporting solution, pyhtmlreport solves that by creating HTML reports and represents the output as steps with screenshots.
 
 ### Requirements ###
 
-* Requires Python 3.7 or higher
-* Access to Internet, materlizecss (https://materializecss.com/) is used to style the html report and accessed via cdn
+* Requires Python 3.7 or higher.
+* Access to Internet, materlizecss (https://materializecss.com/) is used to style the html report and accessed via cdn.
 
-## How to use ###
+### How to Install ###
+
+```
+pip install pyhtmlreport
+```
+
+### Getting Started Guide ###
+
+Once you have installed pyhtmlreport - how do you get started?
+* Import the Report class and create a Report instance.
+* Call the setup method.</br>
+    **Parameters**
+    * *Report Folder*: Root report folder to contain all test reports.
+    * *Module Name*: Name of the application, a module within the application or a function.
+    * *Release Name*: Application Release cycle.
+    * *Maximum Screenshots*: By default, the number of screenshots for a Report instance is 1000. This parameter can be used to increase the number.
+    * *Selenium Webdriver*: Screenshots are taken using the pillow library. If an instance of Selenium Webdriver is provided, the brower viewport is taken as screenshot using Selenium's save_screenshot method.
+* Start writing to the test report by using the write_step method. The first step should have the **Start** status, it signals the start of a test to the report instance.</br>
+    **Parameters**
+    * *Step*: Description (Expected or Actual Step Description).
+    * *Status*: Start, Pass, Fail and Warn.
+    * *Screenshot*: Optional flag to capture screenshot for a step.
+* Call the generate_report method at the end to generate the HTML report.
 
 ```python
 from pyhtmlreport import Report
