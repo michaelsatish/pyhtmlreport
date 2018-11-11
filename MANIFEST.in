@@ -1,0 +1,3 @@
+include tests/test*.py
+include LICENSE
+include MANIFEST.in
